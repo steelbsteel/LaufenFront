@@ -1,0 +1,29 @@
+targets:
+  $default:
+    builders:
+      # Default slang builder fails with "Asset already exists" when
+      # lib/gen/strings*.g.dart are tracked in git (build_runner 2.16+).
+      # See: https://github.com/slang-i18n/slang/issues/351
+      slang_build_runner:
+        enabled: false
+      slang_build_runner:legacy:
+        enabled: true
+        options:
+          base_locale: en
+          timestamp: false
+      graphql_codegen:
+        options:
+          scalars:
+            Date:
+              type: DateTime
+              fromJsonFunctionName: dateFromJsonUtcToLocal
+              toJsonFunctionName: dateToUtcToJson
+              import: package:cifrolab/app/data/schemas/scalar.dart
+            DateTime:
+              type: DateTime
+              fromJsonFunctionName: dateTimeFromJsonUtcToLocal
+              toJsonFunctionName: dateTimeToUtcToJson
+              import: package:cifrolab/app/data/schemas/scalar.dart
+          clients:
+            - graphql
+            - graphql_flutter
