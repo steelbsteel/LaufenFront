@@ -1,3 +1,14 @@
+/// Date format
+const String USER_DATE_FORMAT = "dd.MM.yyyy - HH:mm";
+const String GRAPHQL_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+const String GRAPHQL_DATE_FORMAT = "yyyy-MM-dd";
+const String SIMPLE_FORMAT = "dd.MM.yyyy";
+const String SIMPLE_SMALL_FORMAT = "dd.MM.yy";
+const String SIMPLE_TIME_FORMAT = "HH:mm";
+const String MEETING_TIME_FORMAT = "HH/mm";
+const String SIMPLE_DATE_FORMAT = "dd.MM";
+const String MEETING_DATE_FORMAT = "dd/MM/yyyy";
+
 /// Duration constants
 const int SNACKBAR_DURATION = 5;
 const Duration ANIMATION_DURATION_MS150 = Duration(milliseconds: 150);
@@ -164,3 +175,20 @@ const double WIDTH_60 = 60.0;
 const double WIDTH_70 = 70.0;
 const double WIDTH_80 = 80.0;
 const double WIDTH_120 = 120.0;
+
+/// Week days
+const String MONDAY_RU = 'Понедельник';
+const String TUESDAY_RU = 'Вторник';
+const String WEDNESDAY_RU = 'Среда';
+const String THURSDAY_RU = 'Четверг';
+const String FRIDAY_RU = 'Пятница';
+const String SATURDAY_RU = 'Суббота';
+const String SUNDAY_RU = 'Воскресенье';
+
+const String MONDAY_EN = 'Monday';
+const String TUESDAY_EN = 'Tuesday';
+const String WEDNESDAY_EN = 'Wednesday';
+const String THURSDAY_EN = 'Thursday';
+const String FRIDAY_EN = 'Friday';
+const String SATURDAY_EN = 'Saturday';
+const String SUNDAY_EN = 'Sunday';

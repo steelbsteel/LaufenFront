@@ -1,0 +1,215 @@
+type Query {
+  "Текущий пользователь."
+  me: User!
+
+  "Пробежка текущего пользователя с треком. Нет или чужая — код 2001."
+  run(id: ID!): RunDetails!
+
+  runs(
+    period: RunPeriod
+
+    "Limits number of fetched items. Maximum allowed value: 50."
+    first: Int! = 20
+
+    "The offset from which items are returned."
+    page: Int
+  ): RunSimplePaginator!
+}
+
+type Mutation {
+  "Регистрация. Сразу выдаёт пару токенов."
+  authRegister(input: RegisterInput!): AuthPayload!
+
+  "Вход по email и паролю."
+  authLogin(email: String!, password: String!): AuthPayload!
+
+  "Новая пара токенов по refresh-токену. Переданный refresh-токен после этого недействителен."
+  authTokenRefresh(refreshToken: String!): AuthPayload!
+
+  "Выход: удаляет текущий access-токен и переданный refresh-токен."
+  authLogout(refreshToken: String!): Boolean!
+
+  "Сохранить пробежку с треком. Трек не совпадает по времени — код 2002."
+  runCreate(input: RunCreateInput!): Run!
+
+  "Удалить свою пробежку вместе с треком. Нет или чужая — код 2001."
+  runDelete(id: ID!): Boolean!
+}
+
+"Дата и время в формате `Y-m-d H:i:s`, например `2026-10-19 12:35:10`."
+scalar DateTime
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  createdAt: DateTime!
+}
+
+"Пара токенов и пользователь, которому они выданы."
+type AuthPayload {
+  "Токен для запросов к защищённым полям. Передаётся в заголовке `Authorization: Bearer <token>`."
+  accessToken: String!
+
+  "Токен для получения новой пары через `authTokenRefresh`. В защищённые поля не пускает."
+  refreshToken: String!
+
+  user: User!
+}
+
+input RegisterInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+"Пробежка: итоги без трека. Трек есть только в RunDetails."
+type Run {
+  id: ID!
+
+  "Начало пробежки, UTC."
+  startedAt: DateTime!
+
+  durationSec: Int!
+  distanceM: Int!
+
+  "Средний темп в секундах на километр. null при нулевой дистанции."
+  avgPaceSecPerKm: Int
+
+  calories: Int
+}
+
+"Пробежка с GPS-треком. Отдаётся только запросом одной пробежки."
+type RunDetails {
+  id: ID!
+
+  "Начало пробежки, UTC."
+  startedAt: DateTime!
+
+  durationSec: Int!
+  distanceM: Int!
+
+  "Средний темп в секундах на километр. null при нулевой дистанции."
+  avgPaceSecPerKm: Int
+
+  calories: Int
+
+  "Точки трека в порядке времени."
+  points: [RunPoint!]!
+}
+
+"Точка GPS-трека."
+type RunPoint {
+  lat: Float!
+  lng: Float!
+  recordedAt: DateTime!
+}
+
+enum RunPeriod {
+  "С понедельника текущей недели."
+  WEEK
+
+  "С 1-го числа текущего месяца."
+  MONTH
+
+  "С 1 января текущего года."
+  YEAR
+}
+
+input RunCreateInput {
+  startedAt: DateTime!
+  durationSec: Int!
+  distanceM: Int!
+  calories: Int
+  points: [RunPointInput!]!
+}
+
+input RunPointInput {
+  lat: Float!
+  lng: Float!
+  recordedAt: DateTime!
+}
+
+"Information about pagination using a simple paginator."
+type SimplePaginatorInfo {
+  "Number of items in the current page."
+  count: Int!
+
+  "Index of the current page."
+  currentPage: Int!
+
+  "Index of the first item in the current page."
+  firstItem: Int
+
+  "Index of the last item in the current page."
+  lastItem: Int
+
+  "Number of items per page."
+  perPage: Int!
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
+}
+
+"A paginated list of Run items."
+type RunSimplePaginator {
+  "Pagination information about the list of items."
+  paginatorInfo: SimplePaginatorInfo!
+
+  "A list of Run items."
+  data: [Run!]!
+}
+
+"Directions for ordering a list of records."
+enum SortOrder {
+  "Sort records in ascending order."
+  ASC
+
+  "Sort records in descending order."
+  DESC
+}
+
+"Aggregate functions when ordering by a relation without specifying a column."
+enum OrderByRelationAggregateFunction {
+  "Amount of items."
+  COUNT
+}
+
+"Aggregate functions when ordering by a relation that may specify a column."
+enum OrderByRelationWithColumnAggregateFunction {
+  "Average."
+  AVG
+
+  "Minimum."
+  MIN
+
+  "Maximum."
+  MAX
+
+  "Sum."
+  SUM
+
+  "Amount of items."
+  COUNT
+}
+
+"Allows ordering a list of records."
+input OrderByClause {
+  "The column that is used for ordering."
+  column: String!
+
+  "The direction that is used for ordering."
+  order: SortOrder!
+}
+
+"Specify if you want to include or exclude trashed results from a query."
+enum Trashed {
+  "Only return trashed results."
+  ONLY
+
+  "Return both trashed and non-trashed results."
+  WITH
+
+  "Only return non-trashed results."
+  WITHOUT
+}
